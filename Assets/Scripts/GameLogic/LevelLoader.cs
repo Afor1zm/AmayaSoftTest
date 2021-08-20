@@ -14,9 +14,7 @@ public class LevelLoader : MonoBehaviour
 
     private void Awake()
     {
-        pool = GetComponent<PoolingCards>();
-        gridSpawner = GetComponent<GridSpawner>();
-        levelsSettings = GetComponent<Settings>().GetSettings();
+        GetCachedData();
     }
     private void Start()
     {        
@@ -54,5 +52,12 @@ public class LevelLoader : MonoBehaviour
     public void AddGridElement(GameObject gameObject)
     {
         elementList.Add(gameObject);
+    }
+
+    private void GetCachedData()
+    {
+        pool = GetComponent<PoolingCards>();
+        gridSpawner = GetComponent<GridSpawner>();
+        levelsSettings = GetComponent<Settings>().GetSettings();
     }
 }

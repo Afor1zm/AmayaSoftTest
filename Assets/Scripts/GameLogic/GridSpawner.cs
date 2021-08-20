@@ -7,37 +7,58 @@ public class GridSpawner : MonoBehaviour
     [SerializeField] [Tooltip("Префаб ячейки")] private GameObject gridElement;
     [SerializeField] private LevelSettings levelsSettings;
     [SerializeField] private VisualEffects visualEffects;
+    private PoolingCards pool;
+    private LevelLoader levelLoader;
+    private BoxCollider2D gridElementCollider;
     private int gridLength;
     private int gridHeight;    
     private float stepSpawnX;
-    private float stepSpawnY;
-    private PoolingCards pool;
-    private LevelLoader levelLoader;
+    private float stepSpawnY;    
 
     private void Awake()
     {
-        pool = GetComponent<PoolingCards>();
-        levelsSettings = GetComponent<Settings>().GetSettings();
-        levelLoader = GetComponent<LevelLoader>();
+        GetCachedData();
     }
 
     public void SpawnGrid(int level)
     {
         int gridCount = 0;
-        stepSpawnX = gridElement.GetComponent<BoxCollider2D>().size.x;
-        stepSpawnY = gridElement.GetComponent<BoxCollider2D>().size.y;
+        GetGridparametres(level);
+        CreateGrid(gridCount);
+    }
+
+    private void InitializationCreatedElement(GameObject newElement, int pooledIndex)
+    {
+        newElement.GetComponentInChildren<ObjectData>().Init(pool.GetPooledCards()[pooledIndex]);
+        newElement.GetComponent<ObjectClickReciever>()._levelCompletedEvent.AddListener(levelLoader.IncrimentCurrentLevel);
+        newElement.AddComponent(typeof(VisualEffects));
+    }
+
+    private void GetCachedData()
+    {
+        pool = GetComponent<PoolingCards>();
+        levelsSettings = GetComponent<Settings>().GetSettings();
+        levelLoader = GetComponent<LevelLoader>();
+        gridElementCollider = gridElement.GetComponent<BoxCollider2D>();
+    }
+    private void GetGridparametres(int level)
+    {
+        stepSpawnX = gridElementCollider.size.x;
+        stepSpawnY = gridElementCollider.size.y;
         gridHeight = levelsSettings.height[level];
         gridLength = levelsSettings.length[level];
+    }
+
+    private void CreateGrid(int numberOfElements)
+    {
         for (int i = 0; i < gridHeight; i++)
         {
             for (int y = 0; y < gridLength; y++)
             {
-                var newElementObject = Instantiate(gridElement, new Vector3(stepSpawnX * y, stepSpawnY * i, 0), Quaternion.identity);                
-                newElementObject.GetComponentInChildren<ObjectData>().Init(pool.GetPooledCards()[gridCount]);
-                newElementObject.GetComponent<ObjectClickReciever>()._levelCompletedEvent.AddListener(levelLoader.IncrimentCurrentLevel);
-                newElementObject.AddComponent(typeof(VisualEffects));                
+                GameObject newElementObject = Instantiate(gridElement, new Vector3(stepSpawnX * y, stepSpawnY * i, 0), Quaternion.identity);
+                InitializationCreatedElement(newElementObject, numberOfElements);
                 levelLoader.AddGridElement(newElementObject);
-                gridCount++;
+                numberOfElements++;
                 visualEffects.StartBounce(newElementObject);
             }
         }

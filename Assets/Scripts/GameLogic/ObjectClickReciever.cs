@@ -6,23 +6,26 @@ using System.Collections;
 public class ObjectClickReciever : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField] private CardData winnerCardData;
-    [SerializeField] public UnityEvent _levelCompletedEvent;
+    public UnityEvent _levelCompletedEvent;
     private VisualEffects visualEffects;
+    private GameObject cardDataObject;
+    private ParticleSystem particles;
+    private CardData currnetCardData;
     private void Start()
     {
-        visualEffects = GetComponent<VisualEffects>();
+        GetCacheData();
     }
 
     void IPointerClickHandler.OnPointerClick(PointerEventData eventData)
     {
-        if (gameObject.GetComponentInChildren<ObjectData>().CardData == winnerCardData)
+        if (currnetCardData == winnerCardData)
         {
             StartCoroutine(VisualCoroutine());
         }
 
         else 
         {
-            visualEffects.StartShake(gameObject.GetComponentInChildren<ObjectData>().gameObject);            
+            visualEffects.StartShake(cardDataObject);
         }            
     }
 
@@ -33,9 +36,17 @@ public class ObjectClickReciever : MonoBehaviour, IPointerClickHandler
 
     private IEnumerator VisualCoroutine()
     {
-        visualEffects.StartBounce(gameObject.GetComponentInChildren<ObjectData>().gameObject);
-        visualEffects.StartStarsRain(gameObject);
+        visualEffects.StartBounce(cardDataObject);
+        visualEffects.StartStarsRain(particles);
         yield return new WaitForSeconds(1);
         _levelCompletedEvent.Invoke();
+    }
+
+    private void GetCacheData()
+    {
+        visualEffects = GetComponent<VisualEffects>();
+        cardDataObject = gameObject.GetComponentInChildren<ObjectData>().gameObject;
+        particles = gameObject.GetComponentInChildren<ParticleSystem>();
+        currnetCardData = gameObject.GetComponentInChildren<ObjectData>().CardData;
     }
 }
