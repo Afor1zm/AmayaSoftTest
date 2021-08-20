@@ -34,6 +34,11 @@ public class VisualEffects : MonoBehaviour
     public void StartFadeIn(Image animatedObject)
     {        
         animatedObject.DOFade(0f, 0f);
-        animatedObject.DOFade(0.5f, 3f);
+        animatedObject.DOFade(1f, 1f);
+    }
+
+    public void StartFadeOut(Image animatedObject)
+    {
+        animatedObject.DOFade(0f, 1f);        
     }
 }

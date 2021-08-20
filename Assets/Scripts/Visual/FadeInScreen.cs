@@ -12,4 +12,9 @@ public class FadeInScreen : MonoBehaviour
     {
         visualEffects.StartFadeIn(screenObject);
     }
+
+    public void FadingOut()
+    {
+        visualEffects.StartFadeOut(screenObject);        
+    }
 }
